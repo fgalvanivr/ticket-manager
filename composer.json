@@ -22,6 +22,7 @@
         "symfony/twig-bundle": "*",
         "symfony/validator": "*",
         "symfony/web-link": "*",
+        "symfony/workflow": "*",
         "symfony/yaml": "*"
     },
     "require-dev": {

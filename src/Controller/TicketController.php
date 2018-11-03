@@ -4,44 +4,81 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Ticket;
+use App\Entity\User;
+use App\Service\TicketService;
 
 class TicketController extends AbstractController
 {
     /**
      * @Route("/ticket", name="ticket")
      */
-    public function index()
+    public function index(TicketService $ticketService)
     {
+        // TODO ACL, each registered user can manage only his tickets
+
+        $tickets = $ticketService->getTickets();
         return $this->render('ticket/index.html.twig', [
-            'controller_name' => 'TicketController',
+            'tickets' => $tickets,
         ]);
     }
 
-    public function show() {
+    /**
+     * @Route("/ticket/new", name="create_ticket")
+     */
+    public function create() {
+        // TODO ACL , registered user
+
+        $em = $this->getDoctrine()->getManager();
+
+        $ticket = new Ticket();
+
+
+        $em->persist($product);
+        $em->flush();
+    }
+
+    /**
+     * @Route("/ticket/{id}/show", name="show_ticket")
+     */
+    public function show(Ticket $ticket) {
 
     }
 
-    public function edit() {
+    /**
+     * @Route("/ticket/{id}/edit", name="edit_ticket")
+     */
+    public function edit(Ticket $ticket) {
 
     }
 
-    public function delete() {
-
-    }
-    
-    public function open() {
-        
-    }
-
-    public function reply() {
-
-    }
-    
-    public function close() {
+    /**
+     * @Route("/ticket/{id}/delete", name="delete_ticket")
+     */
+    public function delete(Ticket $ticket) {
 
     }
 
-    public function assign() {
+    /**
+     * @Route("/ticket/{id}/reply", name="reply_ticket")
+     */
+    public function reply(Ticket $ticket) {
+        // TODO ACL , registered user can reply only his tickets
+        // TODO ACL , admin user can reply only his tickets or new tickets
+    }
 
+    /**
+     * @Route("/ticket/{id}/close", name="close_ticket")
+     */
+    public function close(Ticket $ticket) {
+        // TODO ACL , registered user can close only his tickets
+        // TODO ACL , admin user can close only his tickets or new tickets
+    }
+
+    /**
+     * @Route("/ticket/{id}/assign/{userid}", name="assign_ticket")
+     */
+    public function assign(Ticket $ticket, User $user) {
+        // TODO ACL , admin user can take a new ticket, and can transfer it to another admin user
     }
 }

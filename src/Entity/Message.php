@@ -24,7 +24,13 @@ class Message
     /**
      * @ORM\Column(type="text")
      */
-    private $Body;
+    private $body;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticket", inversedBy="messages")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $ticket;
 
     public function getId(): ?int
     {
@@ -51,6 +57,18 @@ class Message
     public function setBody(string $Body): self
     {
         $this->Body = $Body;
+
+        return $this;
+    }
+
+    public function getTicket(): ?Ticket
+    {
+        return $this->ticket;
+    }
+
+    public function setTicket(?Ticket $ticket): self
+    {
+        $this->ticket = $ticket;
 
         return $this;
     }

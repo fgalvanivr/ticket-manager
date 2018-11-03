@@ -1,0 +1,24 @@
+framework:
+    workflows:
+        ticket_managing:
+            type: 'workflow' # or 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'single_state' # 'multiple_state' or 'single_state'
+                arguments:
+                    - 'currentPlace'
+            supports:
+                - App\Entity\Ticket
+            initial_place: new
+            places:
+                - new
+                - working
+                - closed
+            transitions:
+                assign_ticket:
+                    from: new
+                    to:   working
+                close_ticket:
+                    from: working
+                    to:   closed

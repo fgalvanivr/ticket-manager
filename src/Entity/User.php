@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -32,6 +34,22 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Ticket", mappedBy="createdBy")
+     */
+    private $createdTickets;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Ticket", mappedBy="assignedTo")
+     */
+    private $assignedTickets;
+
+    public function __construct()
+    {
+        $this->createdTickets = new ArrayCollection();
+        $this->assignedTickets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -109,5 +127,67 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection|Ticket[]
+     */
+    public function getCreatedTickets(): Collection
+    {
+        return $this->createdTickets;
+    }
+
+    public function addCreatedTicket(Ticket $ticket): self
+    {
+        if (!$this->createdTickets->contains($ticket)) {
+            $this->createdTickets[] = $ticket;
+            $ticket->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedTicket(Ticket $ticket): self
+    {
+        if ($this->createdTickets->contains($ticket)) {
+            $this->createdTickets->removeElement($ticket);
+            // set the owning side to null (unless already changed)
+            if ($ticket->getCreatedBy() === $this) {
+                $ticket->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ticket[]
+     */
+    public function getAssignedTickets(): Collection
+    {
+        return $this->assignedTickets;
+    }
+
+    public function addAssignedTicket(Ticket $ticket): self
+    {
+        if (!$this->assignedTickets->contains($ticket)) {
+            $this->assignedTickets[] = $ticket;
+            $ticket->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTicket(Ticket $ticket): self
+    {
+        if ($this->assignedTickets->contains($ticket)) {
+            $this->assignedTickets->removeElement($ticket);
+            // set the owning side to null (unless already changed)
+            if ($ticket->getAssignedTo() === $this) {
+                $ticket->setAssignedTo(null);
+            }
+        }
+
+        return $this;
     }
 }
