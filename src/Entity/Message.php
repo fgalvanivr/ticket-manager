@@ -17,7 +17,8 @@ class Message
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $createdBy;
 
@@ -37,12 +38,12 @@ class Message
         return $this->id;
     }
 
-    public function getCreatedBy(): ?string
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(string $createdBy): self
+    public function setCreatedBy(?User $createdBy): self
     {
         $this->createdBy = $createdBy;
 
@@ -51,12 +52,12 @@ class Message
 
     public function getBody(): ?string
     {
-        return $this->Body;
+        return $this->body;
     }
 
-    public function setBody(string $Body): self
+    public function setBody(string $body): self
     {
-        $this->Body = $Body;
+        $this->body = $body;
 
         return $this;
     }

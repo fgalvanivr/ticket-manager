@@ -29,7 +29,7 @@ class Ticket
     private $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Message", mappedBy="ticket", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Message", mappedBy="ticket", orphanRemoval=true, cascade={"persist"})
      */
     private $messages;
 

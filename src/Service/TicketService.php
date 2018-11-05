@@ -5,14 +5,18 @@ namespace App\Service;
 use App\Entity\Ticket;
 use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Security\Core\Security;
 
 class TicketService
 {
     private $em;
 
-    public function __construct(ObjectManager $em)
+    private $security;
+
+    public function __construct(ObjectManager $em, Security $security)
     {
         $this->em = $em;
+        $this->security = $security;
     }
 
     public function getTickets()
@@ -25,16 +29,23 @@ class TicketService
     }
 
 
-    public function create() {
+    public function create(?Ticket $ticket) {
         // TODO ACL , registered user
 
-/*        $em = $this->getDoctrine()->getManager();
+        if (empty($ticket)) {
+            $ticket = new Ticket();
+        }
 
-        $ticket = new Ticket();
+        $author = $this->security->getUser();
 
+        $ticket->setCreatedAt(new \DateTime());
+        $ticket->setUpdatedAt(new \DateTime());
+        $ticket->setCreatedBy($author);
 
-        $em->persist($product);
-        $em->flush();*/
+        $this->em->persist($ticket);
+        $this->em->flush();
+        
+        return $ticket;
     }
 
     public function show(Ticket $ticket) {

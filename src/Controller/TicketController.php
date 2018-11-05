@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Ticket;
+use App\Form\TicketType;
 use App\Entity\User;
 use App\Service\TicketService;
 
@@ -26,16 +28,25 @@ class TicketController extends AbstractController
     /**
      * @Route("/ticket/new", name="create_ticket")
      */
-    public function create() {
+    public function create(Request $request, TicketService $ticketService) {
         // TODO ACL , registered user
-
-        $em = $this->getDoctrine()->getManager();
 
         $ticket = new Ticket();
 
+        $form = $this->createForm(TicketType::class, $ticket);
 
-        $em->persist($product);
-        $em->flush();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticket = $ticketService->create($form->getData());
+        }
+
+        return $this->render('ticket/create.html.twig', array(
+            'form' => $form->createView(),
+        ));
+
+
+        //$em->persist($product);
+        //$em->flush();
     }
 
     /**
