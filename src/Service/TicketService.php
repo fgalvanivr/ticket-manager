@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Ticket;
+use App\Entity\Message;
 use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Security;
@@ -29,18 +30,18 @@ class TicketService
     }
 
 
-    public function create(?Ticket $ticket) {
+    public function create(?Message $message) {
         // TODO ACL , registered user
 
-        if (empty($ticket)) {
-            $ticket = new Ticket();
-        }
+        $ticket = new Ticket();
 
-        $author = $this->security->getUser();
+        //$author = $this->security->getUser();
+        $author = $message->getCreatedBy();
 
         $ticket->setCreatedAt(new \DateTime());
         $ticket->setUpdatedAt(new \DateTime());
         $ticket->setCreatedBy($author);
+        $ticket->addMessage($message);
 
         $this->em->persist($ticket);
         $this->em->flush();
