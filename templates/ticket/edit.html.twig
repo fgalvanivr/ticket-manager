@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Ticket{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Edit Ticket {{ ticket.id }}</h1>
+
+    <dl class="row">
+        <dt class="col-sm-3">Created at</dt>
+        <dd class="col-sm-9">{{ ticket.createdAt|date('d-m-Y H:i:s') }}</dd>
+        <dt class="col-sm-3">Updated at</dt>
+        <dd class="col-sm-9">{{ ticket.updatedAt|date('d-m-Y H:i:s') }}</dd>
+        <dt class="col-sm-3">Author</dt>
+        <dd class="col-sm-9">{{ ticket.createdBy.username }}</dd>
+        <dt class="col-sm-3">Assigned to</dt>
+        <dd class="col-sm-9">{{ ticket.assignedTo ? ticket.assignedTo.username : '-' }}</dd>
+    </dl>
+
+    <table class="table">
+    {% for message in ticket.messages %}
+        <tr>
+          <td>{{ message.createdBy ? message.createdBy.username : '-' }}</td>
+          <td class="card-text">{{ message.body }}</td>
+        </tr>
+    {% endfor %}
+    
+        <tr>
+            <td colspan="2">
+            <div class="form-group">
+            {{ form_start(form, {'attr': {'class': 'form-inline'} }) }}
+            {{ form_widget(form.body, {'attr': {'class': 'form-control min-height-200', 'placeholder': 'Reply'} } ) }}
+            <button type="submit" class="btn btn-primary btn-lg btn-save" title="Send">Send</button>
+            {{ form_end(form) }}
+            </div>
+        </td>
+    </table>
+    
+</div>
+{% endblock %}
+

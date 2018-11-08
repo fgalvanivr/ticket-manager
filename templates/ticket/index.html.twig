@@ -24,7 +24,7 @@
         <tbody>
         {% for ticket in tickets %}
         <tr>
-            <td><a href="{{ 'src/Controller/TicketController.php'|file_link(0) }}">{{ ticket.createdAt|date('d-m-Y H:i:s') }}</a></td>
+            <td><a href="{{ path('edit_ticket', {"id": ticket.id}) }}">{{ ticket.createdAt|date('d-m-Y H:i:s') }}</a></td>
             <td>{{ ticket.createdBy ? ticket.createdBy.username : '-' }}</td>
             <td>{{ ticket.assignedTo ? ticket.assignedTo.username : '-' }}</td>
             <td>{#{ ticket.currentPlace }#}</td>

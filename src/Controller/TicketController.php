@@ -7,10 +7,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Ticket;
 use App\Entity\Message;
-use App\Form\TicketType;
 use App\Form\MessageType;
 use App\Entity\User;
 use App\Service\TicketService;
+use App\Service\StateService;
 
 class TicketController extends AbstractController
 {
@@ -30,7 +30,7 @@ class TicketController extends AbstractController
     /**
      * @Route("/ticket/new", name="create_ticket")
      */
-    public function create(Request $request, TicketService $ticketService) {
+    public function create(Request $request, TicketService $ticketService, StateService $stateService) {
         // TODO ACL , registered user
 
         $message = new Message();
@@ -42,30 +42,40 @@ class TicketController extends AbstractController
             $message = $form->getData();
             $ticket = $ticketService->create($message);
 
+            $check = $stateService->initialize($ticket);
+            if (!$check) {
+                die('Initializing state failed');
+            }
+
             return $this->redirectToRoute('ticket');
         }
 
         return $this->render('ticket/create.html.twig', [
             'form' => $form->createView(),
         ]);
-
-
-        //$em->persist($product);
-        //$em->flush();
-    }
-
-    /**
-     * @Route("/ticket/{id}/show", name="show_ticket")
-     */
-    public function show(Ticket $ticket) {
-
     }
 
     /**
      * @Route("/ticket/{id}/edit", name="edit_ticket")
      */
-    public function edit(Ticket $ticket) {
+    public function edit(Request $request, TicketService $ticketService, Ticket $ticket) {
 
+        $message = new Message();
+
+        $form = $this->createForm(MessageType::class, $message);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $message = $form->getData();
+            $ticket = $ticketService->edit($ticket, $message);
+
+            return $this->redirectToRoute('ticket');
+        }
+
+        return $this->render('ticket/edit.html.twig', [
+            'form' => $form->createView(),
+            'ticket' => $ticket
+        ]);
     }
 
     /**

@@ -49,12 +49,14 @@ class TicketService
         return $ticket;
     }
 
-    public function show(Ticket $ticket) {
+    public function edit(Ticket $ticket, Message $message) {
 
-    }
+        $ticket->setUpdatedAt(new \DateTime());
+        $ticket->addMessage($message);
 
-    public function edit(Ticket $ticket) {
+        $this->em->flush();
 
+        return $ticket;
     }
 
     public function delete(Ticket $ticket) {

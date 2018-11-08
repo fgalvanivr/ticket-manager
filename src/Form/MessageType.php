@@ -6,7 +6,7 @@ use App\Entity\Message;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -24,11 +24,11 @@ class MessageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('body', TextType::class, [
+            ->add('body', TextareaType::class, [
                 'required' => true,
                 'label' => "Body"
             ])
-            ->add('save', SubmitType::class, ['label' => 'Send Message','attr' => ['class' => 'btn btn-primary']])
+            //->add('save', SubmitType::class, ['label' => 'Send Message','attr' => ['class' => 'btn btn-primary']])
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']

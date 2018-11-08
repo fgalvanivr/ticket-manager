@@ -11,9 +11,12 @@
 <div class="example-wrapper">
     <h1>New Ticket</h1>
 
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
+    <div class="form-group">
+    {{ form_start(form, {'attr': {'class': 'form-inline'} }) }}
+    {{ form_widget(form.body, {'attr': {'class': 'form-control min-height-200', 'placeholder': 'Reply'} } ) }}
+    <button type="submit" class="btn btn-primary btn-lg btn-save" title="Send">Send</button>
     {{ form_end(form) }}
+    </div>
     
 </div>
 {% endblock %}
