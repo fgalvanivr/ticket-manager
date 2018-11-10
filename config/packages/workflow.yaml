@@ -1,7 +1,7 @@
 framework:
     workflows:
         ticket_managing:
-            type: 'workflow' # or 'state_machine'
+            type: 'state_machine' # 'workflow' or 'state_machine'
             audit_trail:
                 enabled: true
             marking_store:
@@ -18,7 +18,7 @@ framework:
             transitions:
                 assign_ticket:
                     from: new
-                    to:   working
+                    to: working
                 close_ticket:
-                    from: working
-                    to:   closed
+                    from: [new,working]
+                    to: closed

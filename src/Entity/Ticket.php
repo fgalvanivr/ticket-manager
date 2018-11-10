@@ -36,7 +36,7 @@ class Ticket
     /**
      * @ORM\Column(type="json", nullable=true)
      */
-    private $currentPlace = [];
+    private $currentPlace;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tickets")
@@ -114,12 +114,12 @@ class Ticket
         return $this;
     }
 
-    public function getCurrentPlace(): ?array
+    public function getCurrentPlace()
     {
         return $this->currentPlace;
     }
 
-    public function setCurrentPlace(?array $currentPlace): self
+    public function setCurrentPlace($currentPlace): self
     {
         $this->currentPlace = $currentPlace;
 

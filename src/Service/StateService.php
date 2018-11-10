@@ -20,9 +20,9 @@ class StateService
     public function initialize(Ticket $ticket) {
         $workflow = $this->workflows->get($ticket, self::WORKFLOW_NAME);
 
-        $workflow->getMarking($ticket);
+        $marking = $workflow->getMarking($ticket);
         
-        return true;
+        return $ticket;
     }
 
     public function assignTicket(Ticket $ticket) {
@@ -41,6 +41,7 @@ class StateService
 
         try {
             $workflow->apply($ticket, 'close_ticket');
+
         } catch (TransitionException $ex) {
             return false;
         }

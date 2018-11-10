@@ -10,7 +10,6 @@ use App\Entity\Message;
 use App\Form\MessageType;
 use App\Entity\User;
 use App\Service\TicketService;
-use App\Service\StateService;
 
 class TicketController extends AbstractController
 {
@@ -30,8 +29,8 @@ class TicketController extends AbstractController
     /**
      * @Route("/ticket/new", name="create_ticket")
      */
-    public function create(Request $request, TicketService $ticketService, StateService $stateService) {
-        // TODO ACL , registered user
+    public function create(Request $request, TicketService $ticketService) {
+        $this->denyAccessUnlessGranted('ROLE_USER');
 
         $message = new Message();
 
@@ -41,11 +40,6 @@ class TicketController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $message = $form->getData();
             $ticket = $ticketService->create($message);
-
-            $check = $stateService->initialize($ticket);
-            if (!$check) {
-                die('Initializing state failed');
-            }
 
             return $this->redirectToRoute('ticket');
         }
@@ -59,6 +53,8 @@ class TicketController extends AbstractController
      * @Route("/ticket/{id}/edit", name="edit_ticket")
      */
     public function edit(Request $request, TicketService $ticketService, Ticket $ticket) {
+
+        $this->denyAccessUnlessGranted('edit', $ticket);
 
         $message = new Message();
 
@@ -81,30 +77,33 @@ class TicketController extends AbstractController
     /**
      * @Route("/ticket/{id}/delete", name="delete_ticket")
      */
-    public function delete(Ticket $ticket) {
+    public function delete(TicketService $ticketService, Ticket $ticket) {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-    }
+        $ticketService->delete($ticket);
 
-    /**
-     * @Route("/ticket/{id}/reply", name="reply_ticket")
-     */
-    public function reply(Ticket $ticket) {
-        // TODO ACL , registered user can reply only his tickets
-        // TODO ACL , admin user can reply only his tickets or new tickets
+        return $this->redirectToRoute('ticket');
     }
 
     /**
      * @Route("/ticket/{id}/close", name="close_ticket")
      */
-    public function close(Ticket $ticket) {
-        // TODO ACL , registered user can close only his tickets
-        // TODO ACL , admin user can close only his tickets or new tickets
+    public function close(TicketService $ticketService, Ticket $ticket) {
+        $this->denyAccessUnlessGranted('close', $ticket);
+
+        $ticketService->close($ticket);
+
+        return $this->redirectToRoute('ticket');
     }
 
     /**
-     * @Route("/ticket/{id}/assign/{userid}", name="assign_ticket")
+     * @Route("/ticket/{id}/assign", name="assign_ticket")
      */
-    public function assign(Ticket $ticket, User $user) {
-        // TODO ACL , admin user can take a new ticket, and can transfer it to another admin user
+    public function assign(TicketService $ticketService, Ticket $ticket) {
+        $this->denyAccessUnlessGranted('assign', $ticket);
+
+        $ticketService->assign($ticket);
+
+        return $this->redirectToRoute('ticket');
     }
 }

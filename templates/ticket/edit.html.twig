@@ -10,7 +10,7 @@
 
 <div class="example-wrapper">
     <h1>Edit Ticket {{ ticket.id }}</h1>
-
+    <hr>
     <dl class="row">
         <dt class="col-sm-3">Created at</dt>
         <dd class="col-sm-9">{{ ticket.createdAt|date('d-m-Y H:i:s') }}</dd>
@@ -33,9 +33,10 @@
         <tr>
             <td colspan="2">
             <div class="form-group">
-            {{ form_start(form, {'attr': {'class': 'form-inline'} }) }}
+            {{ form_start(form, {'attr': {'class': ''} }) }}
             {{ form_widget(form.body, {'attr': {'class': 'form-control min-height-200', 'placeholder': 'Reply'} } ) }}
-            <button type="submit" class="btn btn-primary btn-lg btn-save" title="Send">Send</button>
+            <a href="{{ path('ticket') }}" class="btn btn-default btn-lg float-left" title="Back" style="margin-top:10px;">Back</a>
+            <button type="submit" class="btn btn-primary btn-lg btn-save float-right" title="Send" style="margin-top:10px;">Send</button>
             {{ form_end(form) }}
             </div>
         </td>

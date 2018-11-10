@@ -11,7 +11,7 @@
 <div class="example-wrapper">
     <h1>Tickets</h1>
 
-    <div><a class="btn btn-primary float-right" href="{{ path('create_ticket') }}"><i class="fas fa-plus"></i> Ticket</a></div>
+    <div><a class="btn btn-primary float-right" href="{{ path('create_ticket') }}" style="margin-bottom:10px;"><i class="fas fa-plus"></i> Ticket</a></div>
     <table class="table">
         <thead>
         <tr>
@@ -19,15 +19,22 @@
             <th>Author</th>
             <th>Assigned to</th>
             <th>State</th>
+            <th><i class="fas fa-cog"></i></th>
         </tr>
         </thead>
         <tbody>
         {% for ticket in tickets %}
         <tr>
-            <td><a href="{{ path('edit_ticket', {"id": ticket.id}) }}">{{ ticket.createdAt|date('d-m-Y H:i:s') }}</a></td>
+            <td>{{ ticket.createdAt|date('d-m-Y H:i:s') }}</td>
             <td>{{ ticket.createdBy ? ticket.createdBy.username : '-' }}</td>
             <td>{{ ticket.assignedTo ? ticket.assignedTo.username : '-' }}</td>
-            <td>{#{ ticket.currentPlace }#}</td>
+            <td>{{ ticket.currentPlace }}</td>
+            <td>
+                <a href="{{ path('edit_ticket', {"id": ticket.id}) }}"><i class="fas fa-edit"></i></a>
+                <a href="{{ path('assign_ticket', {"id": ticket.id}) }}"><i class="far fa-handshake"></i></a>
+                <a href="{{ path('close_ticket', {"id": ticket.id}) }}"><i class="fas fa-window-close"></i></a>
+                <a href="{{ path('delete_ticket', {"id": ticket.id}) }}"><i class="fas fa-trash-alt"></i></a>
+            </td>
         </tr>
         {% endfor %}
         </tbody>

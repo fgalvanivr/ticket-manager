@@ -7,6 +7,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Security;
+use App\Service\StateService;
 
 class TicketService
 {
@@ -14,10 +15,13 @@ class TicketService
 
     private $security;
 
-    public function __construct(ObjectManager $em, Security $security)
+    private $stateService;
+
+    public function __construct(ObjectManager $em, Security $security, StateService $stateService)
     {
         $this->em = $em;
         $this->security = $security;
+        $this->stateService = $stateService;
     }
 
     public function getTickets()
@@ -31,11 +35,9 @@ class TicketService
 
 
     public function create(?Message $message) {
-        // TODO ACL , registered user
 
         $ticket = new Ticket();
 
-        //$author = $this->security->getUser();
         $author = $message->getCreatedBy();
 
         $ticket->setCreatedAt(new \DateTime());
@@ -44,6 +46,11 @@ class TicketService
         $ticket->addMessage($message);
 
         $this->em->persist($ticket);
+
+        $check = $this->stateService->initialize($ticket);
+        if (!$check) {
+            die('Initializing state failed');
+        }
         $this->em->flush();
         
         return $ticket;
@@ -54,26 +61,34 @@ class TicketService
         $ticket->setUpdatedAt(new \DateTime());
         $ticket->addMessage($message);
 
+        if (empty($ticket->getAssignedTo())) {
+            if ($this->security->isGranted('ROLE_ADMIN')) {
+                $user = $this->security->getUser();
+                $ticket->setAssignedTo($user);
+                $this->stateService->assignTicket($ticket);
+            }
+        }
         $this->em->flush();
 
         return $ticket;
     }
 
     public function delete(Ticket $ticket) {
-
-    }
-
-    public function reply(Ticket $ticket) {
-        // TODO ACL , registered user can reply only his tickets
-        // TODO ACL , admin user can reply only his tickets or new tickets
+        $this->em->remove($ticket);
+        $this->em->flush();
     }
 
     public function close(Ticket $ticket) {
-        // TODO ACL , registered user can close only his tickets
-        // TODO ACL , admin user can close only his tickets or new tickets
+        $this->stateService->closeTicket($ticket);
+        $this->em->flush();
     }
 
-    public function assign(Ticket $ticket, User $user) {
-        // TODO ACL , admin user can take a new ticket, and can transfer it to another admin user
+    public function assign(Ticket $ticket) {
+        $user = $this->security->getUser();
+        $ticket->setAssignedTo($user);
+
+        $this->stateService->assignTicket($ticket);
+        
+        $this->em->flush();
     }
 }
