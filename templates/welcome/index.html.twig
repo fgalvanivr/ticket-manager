@@ -13,10 +13,10 @@
 
     <ul>
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-            <li><a href="{{ path('app_logout') }}">LOGOUT</a></li>
-            <li><a href="{{ path('ticket') }}">TICKETS</a></li>
+            <a href="{{ path('app_logout') }}">Logout</a>
+            <a href="{{ path('ticket') }}">Tickets</a>
         {% else %}
-            <li><a href="{{ path('app_login') }}">LOGIN</a></li>
+            <a href="{{ path('app_login') }}">Login</a>
         {% endif %}
     </ul>
 </div>

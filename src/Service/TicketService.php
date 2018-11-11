@@ -17,18 +17,30 @@ class TicketService
 
     private $stateService;
 
+    private $currentUser;
+
+    private $ticketRepo;
+
     public function __construct(ObjectManager $em, Security $security, StateService $stateService)
     {
         $this->em = $em;
         $this->security = $security;
         $this->stateService = $stateService;
+        $this->currentUser = $security->getUser();
+        $this->ticketRepo = $em->getRepository(Ticket::class);
     }
 
     public function getTickets()
     {
         // TODO ACL, each registered user can manage only his tickets
 
-        $tickets = $this->em->getRepository(Ticket::class)->findAll();
+        $tickets = [];
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            $tickets = $this->ticketRepo->findAll();
+        }
+        else {
+            $tickets = $this->ticketRepo->findByCreatedBy($this->currentUser);
+        }
         
         return $tickets;
     }
@@ -63,8 +75,7 @@ class TicketService
 
         if (empty($ticket->getAssignedTo())) {
             if ($this->security->isGranted('ROLE_ADMIN')) {
-                $user = $this->security->getUser();
-                $ticket->setAssignedTo($user);
+                $ticket->setAssignedTo($this->currentUser);
                 $this->stateService->assignTicket($ticket);
             }
         }
@@ -84,11 +95,16 @@ class TicketService
     }
 
     public function assign(Ticket $ticket) {
-        $user = $this->security->getUser();
+
+        $this->assignTo($ticket, $this->currentUser);
+    }
+
+    public function assignTo(Ticket $ticket, User $user) {
+
         $ticket->setAssignedTo($user);
 
         $this->stateService->assignTicket($ticket);
-        
+
         $this->em->flush();
     }
 }

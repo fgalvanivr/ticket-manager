@@ -10,7 +10,9 @@ use Symfony\Component\Security\Core\Security;
 class TicketVoter extends Voter
 {
     const EDIT = 'edit';
+    const DELETE = 'delete';
     const ASSIGN = 'assign';
+    const ASSIGN_TO = 'assignTo';
     const CLOSE = 'close';
 
     private $security;
@@ -23,7 +25,7 @@ class TicketVoter extends Voter
     protected function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, [self::EDIT,self::ASSIGN,self::CLOSE])) {
+        if (!in_array($attribute, [self::EDIT,self::DELETE,self::ASSIGN,self::ASSIGN_TO,self::CLOSE])) {
             return false;
         }
 
@@ -51,8 +53,12 @@ class TicketVoter extends Voter
         switch ($attribute) {
             case self::EDIT:
                 return $this->canEdit($ticket, $user);
+            case self::DELETE:
+                return $this->canDelete($ticket, $user);
             case self::ASSIGN:
                 return $this->canAssign($ticket, $user);
+            case self::ASSIGN_TO:
+                return $this->canAssignTo($ticket, $user);
             case self::CLOSE:
                 return $this->canClose($ticket, $user);
         }
@@ -62,20 +68,30 @@ class TicketVoter extends Voter
 
     private function canEdit(Ticket $ticket, User $user)
     {
-        // this assumes that the data object has a getOwner() method
-        // to get the entity of the user who owns this data object
         return ($ticket->getCurrentPlace() !== "closed") && 
             ($user === $ticket->getCreatedBy() || $user === $ticket->getAssignedTo() ||
             $this->security->isGranted('ROLE_ADMIN') && $ticket->getCurrentPlace() == "new");
     }
 
+    private function canDelete(Ticket $ticket, User $user)
+    {
+        return $ticket->getCurrentPlace() !== "closed" &&
+            $this->security->isGranted('ROLE_ADMIN') && 
+            $user === $ticket->getAssignedTo();
+    }
+
     private function canAssign(Ticket $ticket, User $user)
     {
-        return $this->security->isGranted('ROLE_ADMIN') && $ticket->getCurrentPlace() == "new";
+        return $ticket->getCurrentPlace() !== "closed" && $this->security->isGranted('ROLE_ADMIN') && $ticket->getCurrentPlace() == "new";
     }
 
     private function canClose(Ticket $ticket, User $user)
     {
         return $this->canEdit($ticket, $user);
+    }
+
+    private function canAssignTo(Ticket $ticket, User $user)
+    {
+        return $ticket->getCurrentPlace() !== "closed" && $this->security->isGranted('ROLE_ADMIN') && $ticket->getAssignedTo() == $user;
     }
 }

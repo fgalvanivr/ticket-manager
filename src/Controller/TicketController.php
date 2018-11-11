@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Ticket;
 use App\Entity\Message;
 use App\Form\MessageType;
+use App\Form\AssignToType;
 use App\Entity\User;
 use App\Service\TicketService;
 
@@ -21,6 +22,7 @@ class TicketController extends AbstractController
         // TODO ACL, each registered user can manage only his tickets
 
         $tickets = $ticketService->getTickets();
+        
         return $this->render('ticket/index.html.twig', [
             'tickets' => $tickets,
         ]);
@@ -78,7 +80,7 @@ class TicketController extends AbstractController
      * @Route("/ticket/{id}/delete", name="delete_ticket")
      */
     public function delete(TicketService $ticketService, Ticket $ticket) {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('delete', $ticket);
 
         $ticketService->delete($ticket);
 
@@ -105,5 +107,28 @@ class TicketController extends AbstractController
         $ticketService->assign($ticket);
 
         return $this->redirectToRoute('ticket');
+    }
+
+    /**
+     * @Route("/ticket/{id}/assign-to", name="assign_ticket_to")
+     */
+    public function assignTo(Request $request, TicketService $ticketService, Ticket $ticket) {
+        $this->denyAccessUnlessGranted('assignTo', $ticket);
+
+        $form = $this->createForm(AssignToType::class, []);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $form->get('users')->getData();
+
+            $ticketService->assignTo($ticket, $user);
+
+            return $this->redirectToRoute('ticket');
+        }
+
+        return $this->render('ticket/assign-to.html.twig', [
+            'form' => $form->createView(),
+            'ticket' => $ticket
+        ]);
     }
 }
