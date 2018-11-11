@@ -18,4 +18,14 @@ class UserRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, User::class);
     }
+
+    public function findAllAdminQueryBuilder() {
+        return $this->createQueryBuilder('u')
+                    ->where('u.roles LIKE \'%"ROLE_ADMIN"%\'')
+                    ->orderBy('u.username', 'ASC');
+    }
+
+    public function findAllAdmin() {
+        return $this->findAllAdminQueryBuilder()->getQuery()->getResult();
+    }
 }
