@@ -3,23 +3,26 @@
 namespace App\Service;
 
 use App\Entity\Ticket;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class NotificationService
 {
-    public function __construct()
+    private $request;
+
+    public function __construct(RequestStack $requestStack)
     {
-
+        $this->request = $requestStack->getCurrentRequest();;
     }
 
-    public function sendEmail(Ticket $ticket) {
-        echo "send email ".$ticket->getId().PHP_EOL;
+    public function sendEmail(Ticket $ticket, $recipients) {
+        $this->request->getSession()->getFlashBag()->add('notice', 'Ticket '.$ticket->getId().' send EMAIL to '.$recipients);
     }
 
-    public function sendSMS(Ticket $ticket) {
-        echo "send SMS ".$ticket->getId().PHP_EOL;
+    public function sendSMS(Ticket $ticket, $recipients) {
+        $this->request->getSession()->getFlashBag()->add('notice', 'Ticket '.$ticket->getId().' send SMS to '.$recipients);
     }
 
-    public function sendPushNotification(Ticket $ticket) {
-        echo "send Push notification ".$ticket->getId().PHP_EOL;
+    public function sendPushNotification(Ticket $ticket, $recipients) {
+        $this->request->getSession()->getFlashBag()->add('notice', 'Ticket '.$ticket->getId().' send PUSH NOTIFICATION to '.$recipients);
     }
 }

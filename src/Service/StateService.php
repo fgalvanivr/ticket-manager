@@ -5,6 +5,9 @@ namespace App\Service;
 use Symfony\Component\Workflow\Registry;
 use App\Entity\Ticket;
 use Symfony\Component\Workflow\Exception\TransitionException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Workflow\Event\Event;
+use Symfony\Component\Workflow\Transition;
 
 class StateService
 {
@@ -12,16 +15,23 @@ class StateService
 
     private $workflows;
 
-    public function __construct(Registry $workflows)
+    private $dispatcher;
+
+    public function __construct(Registry $workflows, EventDispatcherInterface $dispatcher = null)
     {
         $this->workflows = $workflows;
+        $this->dispatcher = $dispatcher;
     }
 
     public function initialize(Ticket $ticket) {
         $workflow = $this->workflows->get($ticket, self::WORKFLOW_NAME);
 
         $marking = $workflow->getMarking($ticket);
-        
+
+        $event = new Event($ticket, $marking, new Transition('initialize',null,'new'), $workflow);
+
+        $this->dispatcher->dispatch('workflow.ticket_managing.enter.new', $event);
+
         return $ticket;
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace App\Listener;
 
+use App\Entity\User;
 use App\Service\NotificationService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Workflow\Event\Event;
@@ -18,35 +19,39 @@ class StateListener implements EventSubscriberInterface
         $this->notificationService = $notificationService;
     }
 
-    public function onCreate(Event $event)
+    public function onEnterCreate(Event $event)
     {
-        die('xxx');
         $ticket = $event->getSubject();
 
-        $this->notificationService->sendEmail($ticket);
+        $users = $this->em->getRepository(User::class)->findAllAdmin();
+        $emails = [];
+        foreach ($users as $user) {
+            $emails[] = $user->getEmail();
+        }
+
+        $this->notificationService->sendEmail($ticket,join(',',$emails));
     }
 
-    public function onAssign(Event $event)
+    public function onEnterWorking(Event $event)
     {
-        die('xxx');
         $ticket = $event->getSubject();
 
-        $this->notificationService->sendEmail($ticket);
+        $this->notificationService->sendEmail($ticket,'xxx');
     }
 
-    public function onClose(Event $event)
+    public function onEnterClosed(Event $event)
     {
         $ticket = $event->getSubject();
 
-        $this->notificationService->sendEmail($ticket);
+        $this->notificationService->sendEmail($ticket,'xxx');
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            'workflow.ticket_managing.enter.new' => 'onCreate',
-            'workflow.ticket_managing.enter.assign' => 'onAssign',
-            'workflow.ticket_managing.enter.close' => 'onClose',
+            'workflow.ticket_managing.enter.new' => 'onEnterCreate',
+            'workflow.ticket_managing.enter.working' => 'onEnterWorking',
+            'workflow.ticket_managing.enter.closed' => 'onEnterClosed',
         ];
     }
 }

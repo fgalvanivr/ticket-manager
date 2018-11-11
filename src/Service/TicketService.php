@@ -58,6 +58,7 @@ class TicketService
         $ticket->addMessage($message);
 
         $this->em->persist($ticket);
+        $this->em->flush();
 
         $check = $this->stateService->initialize($ticket);
         if (!$check) {
