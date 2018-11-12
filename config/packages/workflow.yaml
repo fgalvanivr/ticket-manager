@@ -19,6 +19,9 @@ framework:
                 assign_ticket:
                     from: new
                     to: working
+                add_message:
+                    from: working
+                    to: working
                 close_ticket:
                     from: [new,working]
                     to: closed

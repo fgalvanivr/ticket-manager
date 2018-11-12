@@ -80,6 +80,9 @@ class TicketService
                 $this->stateService->assignTicket($ticket);
             }
         }
+        else {
+            $this->stateService->addMessage($ticket);
+        }
         $this->em->flush();
 
         return $ticket;

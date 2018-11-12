@@ -46,6 +46,17 @@ class StateService
         return true;
     }
 
+    public function addMessage(Ticket $ticket) {
+        $workflow = $this->workflows->get($ticket, self::WORKFLOW_NAME);
+
+        try {
+            $workflow->apply($ticket, 'add_message');
+        } catch (TransitionException $ex) {
+            return false;
+        }
+        return true;
+    }
+
     public function closeTicket(Ticket $ticket) {
         $workflow = $this->workflows->get($ticket, self::WORKFLOW_NAME);
 
