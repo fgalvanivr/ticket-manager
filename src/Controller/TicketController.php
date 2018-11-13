@@ -9,7 +9,7 @@ use App\Entity\Ticket;
 use App\Entity\Message;
 use App\Form\MessageType;
 use App\Form\AssignToType;
-use App\Entity\User;
+use App\Form\TicketType;
 use App\Service\TicketService;
 
 class TicketController extends AbstractController
@@ -19,8 +19,6 @@ class TicketController extends AbstractController
      */
     public function index(TicketService $ticketService)
     {
-        // TODO ACL, each registered user can manage only his tickets
-
         $tickets = $ticketService->getTickets();
         
         return $this->render('ticket/index.html.twig', [
@@ -34,14 +32,16 @@ class TicketController extends AbstractController
     public function create(Request $request, TicketService $ticketService) {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        $ticket = new Ticket();
         $message = new Message();
+        $ticket->addMessage($message);
 
-        $form = $this->createForm(MessageType::class, $message);
+        $form = $this->createForm(TicketType::class, $ticket);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $message = $form->getData();
-            $ticket = $ticketService->create($message);
+            $ticket = $form->getData();
+            $ticketService->create($ticket);
 
             return $this->redirectToRoute('ticket');
         }

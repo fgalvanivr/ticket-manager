@@ -49,6 +49,16 @@ class Ticket
      */
     private $assignedTo;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $flagSms;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $flagPush;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -146,6 +156,30 @@ class Ticket
     public function setAssignedTo(?User $assignedTo): self
     {
         $this->assignedTo = $assignedTo;
+
+        return $this;
+    }
+
+    public function getFlagSms()
+    {
+        return $this->flagSms;
+    }
+
+    public function setFlagSms($flagSms): self
+    {
+        $this->flagSms = $flagSms;
+
+        return $this;
+    }
+
+    public function getFlagPush()
+    {
+        return $this->flagPush;
+    }
+
+    public function setFlagPush($flagPush): self
+    {
+        $this->flagPush = $flagPush;
 
         return $this;
     }

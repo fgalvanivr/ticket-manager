@@ -46,16 +46,10 @@ class TicketService
     }
 
 
-    public function create(?Message $message) {
-
-        $ticket = new Ticket();
-
-        $author = $message->getCreatedBy();
+    public function create(?Ticket $ticket) {
 
         $ticket->setCreatedAt(new \DateTime());
         $ticket->setUpdatedAt(new \DateTime());
-        $ticket->setCreatedBy($author);
-        $ticket->addMessage($message);
 
         $this->em->persist($ticket);
         $this->em->flush();

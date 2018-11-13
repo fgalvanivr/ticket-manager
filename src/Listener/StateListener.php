@@ -32,7 +32,7 @@ class StateListener implements EventSubscriberInterface
 
         $emails = $this->getAllAdminsEmail();
 
-        $this->notificationService->sendEmail($ticket,join(',',$emails),'new ticket');
+        $this->notificationService->sendNotification($ticket,join(',',$emails),'new ticket');
     }
 
     private function getAllAdminsEmail() {
@@ -58,7 +58,7 @@ class StateListener implements EventSubscriberInterface
         else {
             return;
         }
-        $this->notificationService->sendEmail($ticket,$to,'new message');
+        $this->notificationService->sendNotification($ticket,$to,'new message');
     }
 
     public function onCloseTicket(Event $event)
@@ -77,7 +77,7 @@ class StateListener implements EventSubscriberInterface
         } else {
             return;
         }
-        $this->notificationService->sendEmail($ticket,$to,'close ticket');
+        $this->notificationService->sendNotification($ticket,$to,'close ticket');
     }
 
     public function onEnterClosed(Event $event)

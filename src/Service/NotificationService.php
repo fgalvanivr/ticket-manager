@@ -14,6 +14,17 @@ class NotificationService
         $this->request = $requestStack->getCurrentRequest();
     }
 
+    public function sendNotification(Ticket $ticket, $recipients, $message) {
+
+        $this->sendEmail($ticket,$recipients,$message);
+        if ($ticket->getFlagSms()) {
+            $this->sendSMS($ticket,$recipients,$message);
+        }
+        if ($ticket->getFlagPush()) {
+            $this->sendPushNotification($ticket,$recipients,$message);
+        }
+    }
+    
     public function sendEmail(Ticket $ticket, $recipients, $message) {
         $this->request->getSession()->getFlashBag()->add('notice', 'Ticket '.$ticket->getId().' send EMAIL to '.$recipients.' : '.$message);
     }
